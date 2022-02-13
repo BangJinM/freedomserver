@@ -1,0 +1,2 @@
+# freedomserver
+game server
