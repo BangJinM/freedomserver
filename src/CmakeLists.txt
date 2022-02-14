@@ -1,0 +1,12 @@
+file(GLOB_RECURSE H_HEADER_FILES *.h *.hpp)  
+file(GLOB_RECURSE SOURCE_CPP_FILES *.cpp *.cc *.c)
+
+set(ALL_FILES
+    ${H_HEADER_FILES}
+    ${SOURCE_CPP_FILES}
+)
+
+add_executable(freedomserver ${ALL_FILES})
+
+find_package(cryptopp CONFIG REQUIRED)
+target_link_libraries(freedomserver PRIVATE cryptopp-static)
