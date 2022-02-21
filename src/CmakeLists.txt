@@ -8,5 +8,14 @@ set(ALL_FILES
 
 add_executable(freedomserver ${ALL_FILES})
 
+find_package(Lua REQUIRED)
+
 find_package(cryptopp CONFIG REQUIRED)
-target_link_libraries(freedomserver PRIVATE cryptopp-static)
+
+find_path(LUABRIDGE_INCLUDE_DIRS "LuaBridge")
+
+find_path(HV_INCLUDE_DIR "hv")
+find_library(HV_LIBRARIES "hv.lib")
+
+target_link_libraries(freedomserver PRIVATE cryptopp-static ${LUA_LIBRARIES} ${HV_LIBRARIES})
+target_include_directories(freedomserver PRIVATE ${LUABRIDGE_INCLUDE_DIRS} ${LUA_INCLUDE_DIR} ${HV_INCLUDE_DIR})
