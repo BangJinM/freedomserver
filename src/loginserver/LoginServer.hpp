@@ -4,6 +4,7 @@
 #include "hv/TcpServer.h"
 #include "hv/Buffer.h"
 #include "../base/Message.hpp"
+#include "hv/EventLoop.h"
 
 namespace ls
 {
@@ -44,10 +45,12 @@ namespace ls
         {
             // unpack -> Request::ParseFromArray -> router -> Response::SerializeToArray -> pack -> Channel::write
             // protorpc_unpack
-            printf(buf->base);
+            HVLBuf hvlBuffer = HVLBuf(buf->data(), buf->size());
+            hvlBuffer.remove(4); // 移除包长度
             Message message;
-            message.Decode(buf);
+            message.Decode(&hvlBuffer);
             printf(message.ToString().c_str());
+            channel->write(buf); 
         }
     };
 

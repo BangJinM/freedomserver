@@ -33,12 +33,12 @@ namespace fs
 
     void FreedomServer::runFreedomServer()
     {
-        ls::LoginServer server;
-        int listenfd = server.Listen(4444);
+        int listenfd = loginServer.Listen(12345);
         if (listenfd)
         {
-            server.setThreadNum(4);
-            server.start();
+            printf("server listen on port %d, listenfd=%d ...\n", 12345, listenfd);
+            loginServer.setThreadNum(4);
+            loginServer.start();
         }
     }
     void FreedomServer::runLogServer(int server_id)

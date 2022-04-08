@@ -1,5 +1,7 @@
 #pragma once
 
+#include "src/loginserver/LoginServer.hpp"
+
 namespace fs
 {
     class FreedomServer
@@ -23,6 +25,7 @@ namespace fs
         void runGateServer(int server_id);
         void runGameServer(int server_id);
 
+        ls::LoginServer loginServer;
     private:
         static FreedomServer *gFreedomServer;
     };

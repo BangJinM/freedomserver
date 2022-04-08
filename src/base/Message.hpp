@@ -20,9 +20,11 @@ public:
 
     std::string ToString()
     {
-        char buf[sizeof(int)];
+        char *buf = new char[1024* 1024];
         sprintf(buf, "msgID = %d\nparam = %d\nparam1 = %d\nparam2 = %d\nparam3 = %d\nparam4 = %d\nrecog = %d\ndata = %s\n", msgID, param, param1, param2, param3, param4, recog, data.c_str());
-        return buf;
+        std::string str = std::string(buf);
+        delete buf;
+        return str;
     }
 
     hv::Buffer *Encode()
@@ -30,31 +32,49 @@ public:
         // hv::BufferPtr buf = std::make_shared(new hv::Buffer);
     }
 
-    void Decode(hv::Buffer *buf)
+    int getInt(char *lp, bool isBig = true, int len = 4)
     {
-        int offset = 4;
-        msgID = ReadInt(buf, offset);
-        param = ReadInt(buf, offset);
-        param1 = ReadInt(buf, offset);
-        param2 = ReadInt(buf, offset);
-        param3 = ReadInt(buf, offset);
-        param4 = ReadInt(buf, offset);
-        recog = ReadInt(buf, offset);
-        int size = buf->size() - 32;
-
-        if (size > 0)
+        int body_len = 0;
+        if (isBig)
         {
-            char *c = new char[size];
-            memcpy(c, buf->base + 32, size);
-            std::string str = std::move(c);
+            for (int i = 0; i < len; ++i)
+            {
+                body_len = (body_len << 8) | (unsigned int)*lp++;
+            }
         }
+        else
+        {
+            for (int i = 0; i < len; ++i)
+            {
+                body_len |= ((unsigned int)*lp++) << (i * 8);
+            }
+        }
+        return body_len;
     }
 
-    int ReadInt(hv::Buffer *buf, int &offset)
+    void Decode(HVLBuf *hvlBuffer)
     {
-        char i[4];
-        memcpy(i, buf->base + offset, 4);
-        offset += 4;
-        return atoi(i);
+        char *intT = new char[4];
+        printf(intT);
+        hvlBuffer->pop_front(intT, 4);
+        msgID = getInt(intT);
+        hvlBuffer->pop_front(intT, 4);
+        param = getInt(intT);
+        hvlBuffer->pop_front(intT, 4);
+        param1 = getInt(intT);
+        hvlBuffer->pop_front(intT, 4);
+        param2 = getInt(intT);
+        hvlBuffer->pop_front(intT, 4);
+        param3 = getInt(intT);
+        hvlBuffer->pop_front(intT, 4);
+        param4 = getInt(intT);
+        hvlBuffer->pop_front(intT, 4);
+        recog = getInt(intT);
+
+        if (hvlBuffer->size() > 0)
+        {
+            data = std::move(hvlBuffer->data());
+        }
+        delete intT;
     }
 };
